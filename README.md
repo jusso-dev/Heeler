@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.png" alt="Heeler" width="100%">
+</p>
+
 # Heeler
 
 A lightweight, secure, auditable NTP server written in Rust.

@@ -1,0 +1,22 @@
+[package]
+name = "heeler-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+heeler-core = { path = "../crates/heeler-core" }
+
+[[bin]]
+name = "parse_packet"
+path = "fuzz_targets/parse_packet.rs"
+test = false
+doc = false
+bench = false
+
+[profile.release]
+debug = 1

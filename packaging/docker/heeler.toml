@@ -1,0 +1,36 @@
+# Container configuration for Heeler.
+#
+# Binds the unprivileged port 11123 on all interfaces inside the container
+# network namespace; the Docker port mapping (-p 123:11123/udp) decides the
+# real exposure. Access is limited to private ranges — adjust [access] to
+# your networks.
+
+[server]
+bind = ["0.0.0.0:11123"]
+# 0.0.0.0 inside a container namespace is deliberate and behind the port
+# mapping; acknowledge it so strict mode allows startup.
+public_bind_acknowledged = true
+
+[access]
+allow = [
+    "127.0.0.0/8",
+    "::1/128",
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16",
+    "fc00::/7",
+]
+deny = []
+default_action = "deny"
+
+[security]
+# The image already runs as the non-root user 65532; there is nothing to
+# drop. Set to true (with these ids) only when running the container
+# process as root with CAP_SETUID/CAP_SETGID to bind port 123 directly.
+drop_privileges = false
+user = "65532"
+group = "65532"
+
+[logging]
+format = "json"
+level = "info"

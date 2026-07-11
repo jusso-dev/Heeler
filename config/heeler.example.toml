@@ -1,0 +1,112 @@
+# Heeler NTP server configuration.
+#
+# This file documents every option with its built-in default value; the file
+# as shipped is identical to running Heeler with no configuration at all.
+# Precedence: CLI flags > HEELER_* environment variables > this file >
+# built-in defaults.
+
+[server]
+# Addresses to bind. Loopback only by default: serving NTP beyond this host
+# is an explicit operator decision. Use "0.0.0.0:123" / "[::]:123" for all
+# interfaces, together with an [access] allow list.
+bind = ["127.0.0.1:123", "[::1]:123"]
+# Reserved for future use; must be 1.
+workers = 1
+# Largest accepted datagram, bytes (48-1024). Larger datagrams are dropped.
+max_packet_size = 512
+# Refuse to start on a public (non-loopback, non-private) address unless
+# public_bind_acknowledged = true.
+strict_public_bind = true
+public_bind_acknowledged = false
+# Socket buffer sizes in bytes; 0 keeps the OS default.
+recv_buffer_bytes = 0
+send_buffer_bytes = 0
+# Set SO_REUSEADDR on listening sockets.
+reuse_addr = false
+
+[protocol]
+# NTP versions answered. Only 3 and 4 are supported.
+versions = [3, 4]
+# Advertised stratum, 1-15. Stratum 1 additionally requires an explicit
+# reference_id naming a real reference source ("GPS", "PPS", "LOCL", ...).
+# Stratum describes distance from a reference clock, not inherent accuracy.
+stratum = 2
+# Four-byte reference identifier (1-4 printable ASCII characters).
+reference_id = "HLER"
+# Default poll exponent (log2 seconds) when the client's value is unusable.
+poll = 6
+# Advertised precision exponent (log2 seconds), -30..0. When omitted,
+# Heeler measures the system clock's resolution at startup.
+#precision = -20
+# Advertised root delay and root dispersion, milliseconds.
+root_delay_ms = 0
+root_dispersion_ms = 5
+# Leap indicator while synchronised: 0 = no warning, 1 = 61 s minute,
+# 2 = 59 s minute. Heeler never invents leap announcements; set 1 or 2 only
+# from an authoritative source. When the clock is considered unsynchronised
+# Heeler always sends 3 regardless of this value.
+leap_indicator = 0
+# Reject client requests whose transmit timestamp is zero. Off for
+# compatibility with SNTP clients that send zero fields.
+require_nonzero_transmit_timestamp = false
+# Accept datagrams carrying bytes after the 48-byte base packet (extension
+# fields / MACs Heeler does not interpret).
+allow_trailing_data = false
+# Answer per-client rate-limited requests with a RATE Kiss-o'-Death packet
+# (always exactly 48 bytes; never amplifies).
+send_kod_on_rate_limit = true
+# Answer access-denied requests with a DENY Kiss-o'-Death. Off by default:
+# silent drop reveals nothing to scanners.
+send_kod_on_policy_deny = false
+# Drop malformed packets silently (counted in metrics either way).
+silently_drop_malformed = true
+
+[clock]
+# Time source. Only "system" (the operating-system clock) is supported in
+# this release. Heeler never adjusts the system clock.
+source = "system"
+# Wall-clock movement is cross-checked against the monotonic clock; a jump
+# beyond these thresholds marks the server unsynchronised (leap 3,
+# stratum 16) until restart.
+mark_unsynchronised_on_jump = true
+max_backward_jump_ms = 250
+max_forward_jump_ms = 5000
+
+[access]
+# Longest matching prefix wins; on equal prefix length deny wins; otherwise
+# default_action applies. Rules are CIDR prefixes or bare addresses.
+allow = ["127.0.0.0/8", "::1/128"]
+deny = []
+default_action = "deny"
+
+[rate_limit]
+enabled = true
+# Sustained per-client rate and burst.
+requests_per_second = 4
+burst = 8
+# Global bucket across all clients (0 disables the global bucket).
+global_requests_per_second = 10000
+global_burst = 20000
+# Idle client entries expire after this long; the table is bounded and the
+# limiter fails closed (drops new clients) when full.
+client_entry_ttl_seconds = 600
+max_client_entries = 100000
+
+[logging]
+# "pretty", "compact", or "json".
+format = "pretty"
+level = "info"
+
+[metrics]
+# Prometheus text endpoint. Loopback only by default.
+enabled = false
+bind = "127.0.0.1:9180"
+
+[security]
+# Drop root privileges after binding sockets (Unix). A no-op when Heeler is
+# not started as root — prefer CAP_NET_BIND_SERVICE or a high port.
+drop_privileges = true
+user = "heeler"
+group = "heeler"
+# Optional chroot directory; empty disables.
+chroot_dir = ""

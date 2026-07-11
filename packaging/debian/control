@@ -1,0 +1,20 @@
+Source: heeler
+Section: net
+Priority: optional
+Maintainer: Heeler contributors <noreply@example.invalid>
+Build-Depends: debhelper-compat (= 13), cargo, rustc (>= 1.82)
+Standards-Version: 4.6.2
+Homepage: https://github.com/jusso-dev/Heeler
+Rules-Requires-Root: no
+
+Package: heeler
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, adduser
+Description: lightweight, secure NTP server
+ Heeler is a small, auditable NTPv4-compatible unicast time server for
+ private networks, homelabs, and edge deployments. It serves the host
+ system clock over UDP with conservative security defaults: loopback-only
+ access, rate limiting, and no control or administration protocol.
+ .
+ Heeler serves the host system clock; it does not make an inaccurate host
+ clock accurate, and it does not discipline the system clock.

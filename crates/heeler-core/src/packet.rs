@@ -515,9 +515,8 @@ impl NtpPacket {
     #[must_use]
     pub fn encode(&self) -> [u8; PACKET_SIZE] {
         let mut out = [0u8; PACKET_SIZE];
-        out[OFFSET_FLAGS] = (self.leap.to_bits() << 6)
-            | (self.version.to_bits() << 3)
-            | self.mode.to_bits();
+        out[OFFSET_FLAGS] =
+            (self.leap.to_bits() << 6) | (self.version.to_bits() << 3) | self.mode.to_bits();
         out[OFFSET_STRATUM] = self.stratum.value();
         out[OFFSET_POLL] = self.poll as u8;
         out[OFFSET_PRECISION] = self.precision as u8;
@@ -533,7 +532,11 @@ impl NtpPacket {
             OFFSET_REFERENCE_TS,
             self.reference_timestamp.to_be_bytes(),
         );
-        write_8(&mut out, OFFSET_ORIGIN_TS, self.origin_timestamp.to_be_bytes());
+        write_8(
+            &mut out,
+            OFFSET_ORIGIN_TS,
+            self.origin_timestamp.to_be_bytes(),
+        );
         write_8(
             &mut out,
             OFFSET_RECEIVE_TS,

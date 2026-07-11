@@ -95,35 +95,111 @@ impl Metrics {
         use std::fmt::Write as _;
         let mut out = String::with_capacity(2048);
         let counters: [(&str, &str, u64); 13] = [
-            ("heeler_requests_total", "Datagrams received", self.requests_total.load(Ordering::Relaxed)),
-            ("heeler_responses_total", "Responses sent", self.responses_total.load(Ordering::Relaxed)),
-            ("heeler_packets_dropped_total", "Datagrams dropped", self.packets_dropped_total.load(Ordering::Relaxed)),
-            ("heeler_malformed_packets_total", "Malformed datagrams", self.malformed_packets_total.load(Ordering::Relaxed)),
-            ("heeler_unsupported_version_total", "Unsupported NTP version requests", self.unsupported_version_total.load(Ordering::Relaxed)),
-            ("heeler_unsupported_mode_total", "Non-client-mode packets", self.unsupported_mode_total.load(Ordering::Relaxed)),
-            ("heeler_rate_limited_total", "Rate-limited requests", self.rate_limited_total.load(Ordering::Relaxed)),
-            ("heeler_access_denied_total", "Access-denied requests", self.access_denied_total.load(Ordering::Relaxed)),
-            ("heeler_kod_sent_total", "Kiss-o'-Death responses sent", self.kod_sent_total.load(Ordering::Relaxed)),
-            ("heeler_socket_errors_total", "Socket errors", self.socket_errors_total.load(Ordering::Relaxed)),
-            ("heeler_clock_errors_total", "Clock read failures", self.clock_errors_total.load(Ordering::Relaxed)),
-            ("heeler_clock_jumps_total", "Detected wall-clock jumps", self.clock_jumps_total.load(Ordering::Relaxed)),
-            ("heeler_active_rate_limit_entries", "Tracked rate-limiter entries", self.active_rate_limit_entries.load(Ordering::Relaxed)),
+            (
+                "heeler_requests_total",
+                "Datagrams received",
+                self.requests_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_responses_total",
+                "Responses sent",
+                self.responses_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_packets_dropped_total",
+                "Datagrams dropped",
+                self.packets_dropped_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_malformed_packets_total",
+                "Malformed datagrams",
+                self.malformed_packets_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_unsupported_version_total",
+                "Unsupported NTP version requests",
+                self.unsupported_version_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_unsupported_mode_total",
+                "Non-client-mode packets",
+                self.unsupported_mode_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_rate_limited_total",
+                "Rate-limited requests",
+                self.rate_limited_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_access_denied_total",
+                "Access-denied requests",
+                self.access_denied_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_kod_sent_total",
+                "Kiss-o'-Death responses sent",
+                self.kod_sent_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_socket_errors_total",
+                "Socket errors",
+                self.socket_errors_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_clock_errors_total",
+                "Clock read failures",
+                self.clock_errors_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_clock_jumps_total",
+                "Detected wall-clock jumps",
+                self.clock_jumps_total.load(Ordering::Relaxed),
+            ),
+            (
+                "heeler_active_rate_limit_entries",
+                "Tracked rate-limiter entries",
+                self.active_rate_limit_entries.load(Ordering::Relaxed),
+            ),
         ];
         for (name, help, value) in counters {
-            let kind = if name.ends_with("_total") { "counter" } else { "gauge" };
+            let kind = if name.ends_with("_total") {
+                "counter"
+            } else {
+                "gauge"
+            };
             let _ = writeln!(out, "# HELP {name} {help}");
             let _ = writeln!(out, "# TYPE {name} {kind}");
             let _ = writeln!(out, "{name} {value}");
         }
-        let _ = writeln!(out, "# HELP heeler_clock_synchronised 1 while the clock source is synchronised");
+        let _ = writeln!(
+            out,
+            "# HELP heeler_clock_synchronised 1 while the clock source is synchronised"
+        );
         let _ = writeln!(out, "# TYPE heeler_clock_synchronised gauge");
-        let _ = writeln!(out, "heeler_clock_synchronised {}", self.clock_synchronised.load(Ordering::Relaxed));
-        let _ = writeln!(out, "# HELP heeler_uptime_seconds Seconds since the server started");
+        let _ = writeln!(
+            out,
+            "heeler_clock_synchronised {}",
+            self.clock_synchronised.load(Ordering::Relaxed)
+        );
+        let _ = writeln!(
+            out,
+            "# HELP heeler_uptime_seconds Seconds since the server started"
+        );
         let _ = writeln!(out, "# TYPE heeler_uptime_seconds gauge");
-        let _ = writeln!(out, "heeler_uptime_seconds {}", self.started.elapsed().as_secs());
+        let _ = writeln!(
+            out,
+            "heeler_uptime_seconds {}",
+            self.started.elapsed().as_secs()
+        );
 
-        let _ = writeln!(out, "# HELP heeler_response_build_duration_seconds Time to build one response");
-        let _ = writeln!(out, "# TYPE heeler_response_build_duration_seconds histogram");
+        let _ = writeln!(
+            out,
+            "# HELP heeler_response_build_duration_seconds Time to build one response"
+        );
+        let _ = writeln!(
+            out,
+            "# TYPE heeler_response_build_duration_seconds histogram"
+        );
         for (bucket, le) in self.build_bucket_counts.iter().zip(BUILD_BUCKETS_NANOS) {
             let _ = writeln!(
                 out,

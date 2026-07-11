@@ -171,7 +171,10 @@ fn lookup_colon_file(path: &Path, name: &str) -> Option<(u32, u32)> {
         }
         let _password = fields.next()?;
         let id = fields.next()?.trim().parse().ok()?;
-        let second = fields.next().and_then(|f| f.trim().parse().ok()).unwrap_or(id);
+        let second = fields
+            .next()
+            .and_then(|f| f.trim().parse().ok())
+            .unwrap_or(id);
         return Some((id, second));
     }
     None

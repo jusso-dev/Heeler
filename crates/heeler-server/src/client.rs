@@ -200,7 +200,11 @@ pub fn format_report(report: &QueryReport) -> String {
         let _ = writeln!(out, "stratum           {}", r.stratum);
     }
     let _ = writeln!(out, "poll              {}", r.poll);
-    let _ = writeln!(out, "precision         {} (2^{} s)", r.precision, r.precision);
+    let _ = writeln!(
+        out,
+        "precision         {} (2^{} s)",
+        r.precision, r.precision
+    );
     let _ = writeln!(
         out,
         "root delay        {:.6} s",
@@ -214,10 +218,26 @@ pub fn format_report(report: &QueryReport) -> String {
     let _ = writeln!(out, "reference id      {}", r.reference_id);
     let _ = writeln!(out, "reference ts      {}", r.reference_timestamp);
     let _ = writeln!(out);
-    let _ = writeln!(out, "T1 (client tx)    {}", crate::inspect::format_instant(report.t1));
-    let _ = writeln!(out, "T2 (server rx)    {}", crate::inspect::format_instant(report.t2));
-    let _ = writeln!(out, "T3 (server tx)    {}", crate::inspect::format_instant(report.t3));
-    let _ = writeln!(out, "T4 (client rx)    {}", crate::inspect::format_instant(report.t4));
+    let _ = writeln!(
+        out,
+        "T1 (client tx)    {}",
+        crate::inspect::format_instant(report.t1)
+    );
+    let _ = writeln!(
+        out,
+        "T2 (server rx)    {}",
+        crate::inspect::format_instant(report.t2)
+    );
+    let _ = writeln!(
+        out,
+        "T3 (server tx)    {}",
+        crate::inspect::format_instant(report.t3)
+    );
+    let _ = writeln!(
+        out,
+        "T4 (client rx)    {}",
+        crate::inspect::format_instant(report.t4)
+    );
     let _ = writeln!(
         out,
         "raw T2/T3         {} / {}",

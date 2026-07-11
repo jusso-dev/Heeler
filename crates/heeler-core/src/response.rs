@@ -69,9 +69,7 @@ pub fn build_response(
 ) -> NtpPacket {
     let (leap, stratum) = match clock_status {
         ClockStatus::Synchronised => (identity.leap, identity.stratum),
-        ClockStatus::Unsynchronised => {
-            (LeapIndicator::Unsynchronised, Stratum::UNSYNCHRONISED)
-        }
+        ClockStatus::Unsynchronised => (LeapIndicator::Unsynchronised, Stratum::UNSYNCHRONISED),
     };
     NtpPacket {
         leap,
@@ -166,13 +164,8 @@ mod tests {
     #[test]
     fn response_semantics_synchronised() {
         let request = client_request(4);
-        let mut response = build_response(
-            &request,
-            &identity(),
-            ClockStatus::Synchronised,
-            REF,
-            T2,
-        );
+        let mut response =
+            build_response(&request, &identity(), ClockStatus::Synchronised, REF, T2);
         finalize_transmit_timestamp(&mut response, T3);
 
         assert_eq!(response.mode, Mode::Server);
@@ -192,16 +185,14 @@ mod tests {
     #[test]
     fn response_mirrors_request_version() {
         let request = client_request(3);
-        let response =
-            build_response(&request, &identity(), ClockStatus::Synchronised, REF, T2);
+        let response = build_response(&request, &identity(), ClockStatus::Synchronised, REF, T2);
         assert_eq!(response.version, NtpVersion::V3);
     }
 
     #[test]
     fn unsynchronised_clock_forces_alarm_and_stratum_16() {
         let request = client_request(4);
-        let response =
-            build_response(&request, &identity(), ClockStatus::Unsynchronised, REF, T2);
+        let response = build_response(&request, &identity(), ClockStatus::Unsynchronised, REF, T2);
         assert_eq!(response.leap, LeapIndicator::Unsynchronised);
         assert_eq!(response.stratum, Stratum::UNSYNCHRONISED);
     }
@@ -218,8 +209,7 @@ mod tests {
         data[32..40].copy_from_slice(&[0xBB; 8]); // receive ts
         let request = NtpPacket::parse(&data).unwrap().packet;
 
-        let response =
-            build_response(&request, &identity(), ClockStatus::Synchronised, REF, T2);
+        let response = build_response(&request, &identity(), ClockStatus::Synchronised, REF, T2);
         assert_eq!(response.stratum.value(), 2);
         assert_eq!(response.precision, -20);
         assert_eq!(response.root_delay, NtpShortSigned::ZERO);
@@ -232,18 +222,15 @@ mod tests {
     fn poll_echo_and_clamp() {
         let mut request = client_request(4);
         request.poll = 10;
-        let response =
-            build_response(&request, &identity(), ClockStatus::Synchronised, REF, T2);
+        let response = build_response(&request, &identity(), ClockStatus::Synchronised, REF, T2);
         assert_eq!(response.poll, 10);
 
         request.poll = -3; // out of range: use server default
-        let response =
-            build_response(&request, &identity(), ClockStatus::Synchronised, REF, T2);
+        let response = build_response(&request, &identity(), ClockStatus::Synchronised, REF, T2);
         assert_eq!(response.poll, 6);
 
         request.poll = 100; // out of range high
-        let response =
-            build_response(&request, &identity(), ClockStatus::Synchronised, REF, T2);
+        let response = build_response(&request, &identity(), ClockStatus::Synchronised, REF, T2);
         assert_eq!(response.poll, 6);
     }
 

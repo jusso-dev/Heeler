@@ -32,7 +32,9 @@ pub fn decode_hex(input: &str) -> Result<Vec<u8>, InspectError> {
     let mut bytes = Vec::with_capacity(cleaned.len() / 2);
     let digits: Vec<char> = cleaned.chars().collect();
     for (i, pair) in digits.chunks(2).enumerate() {
-        let hi = pair[0].to_digit(16).ok_or(InspectError::InvalidHex(i * 2))?;
+        let hi = pair[0]
+            .to_digit(16)
+            .ok_or(InspectError::InvalidHex(i * 2))?;
         let lo = pair[1]
             .to_digit(16)
             .ok_or(InspectError::InvalidHex(i * 2 + 1))?;
@@ -57,7 +59,11 @@ fn render(parsed: &ParsedPacket, pivot: NtpInstant) -> String {
     let _ = writeln!(out, "mode              {}", p.mode);
     let _ = writeln!(out, "stratum           {}", p.stratum);
     let _ = writeln!(out, "poll              {} (2^{} s)", p.poll, p.poll);
-    let _ = writeln!(out, "precision         {} (2^{} s)", p.precision, p.precision);
+    let _ = writeln!(
+        out,
+        "precision         {} (2^{} s)",
+        p.precision, p.precision
+    );
     let _ = writeln!(
         out,
         "root delay        0x{:08X} ({:.6} s)",
@@ -133,9 +139,7 @@ pub fn format_instant(instant: NtpInstant) -> String {
     let hour = secs_of_day / 3600;
     let minute = (secs_of_day % 3600) / 60;
     let second = secs_of_day % 60;
-    format!(
-        "{year:04}-{month:02}-{day:02}T{hour:02}:{minute:02}:{second:02}.{nanos:09}Z"
-    )
+    format!("{year:04}-{month:02}-{day:02}T{hour:02}:{minute:02}:{second:02}.{nanos:09}Z")
 }
 
 /// Days-since-Unix-epoch to (year, month, day) in the proleptic Gregorian
@@ -160,8 +164,14 @@ mod tests {
     #[test]
     fn hex_decoding() {
         assert_eq!(decode_hex("00ff10").unwrap(), vec![0x00, 0xFF, 0x10]);
-        assert_eq!(decode_hex("0xDEAD BEEF").unwrap(), vec![0xDE, 0xAD, 0xBE, 0xEF]);
-        assert_eq!(decode_hex("  23 00 \n 06 ec ").unwrap(), vec![0x23, 0, 6, 0xEC]);
+        assert_eq!(
+            decode_hex("0xDEAD BEEF").unwrap(),
+            vec![0xDE, 0xAD, 0xBE, 0xEF]
+        );
+        assert_eq!(
+            decode_hex("  23 00 \n 06 ec ").unwrap(),
+            vec![0x23, 0, 6, 0xEC]
+        );
         assert!(decode_hex("abc").is_err());
         assert!(decode_hex("zz").is_err());
     }

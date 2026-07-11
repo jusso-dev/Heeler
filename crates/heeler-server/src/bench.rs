@@ -17,8 +17,8 @@ use heeler_core::response::{build_response, ServerIdentity};
 use heeler_core::timestamp::{NtpInstant, NtpTimestamp};
 
 const REQUEST: [u8; 48] = [
-    0x23, 0x00, 0x06, 0xEC, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xE3, 0xB0, 0xF2, 0xAC, 0x80, 0x00, 0x00, 0x00,
+    0x23, 0x00, 0x06, 0xEC, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xE3, 0xB0, 0xF2, 0xAC, 0x80, 0x00, 0x00, 0x00,
 ];
 
 /// Runs every micro-benchmark and returns a formatted report.
@@ -52,9 +52,8 @@ pub fn run() -> String {
     let _ = writeln!(out, "system clock read          {clock_ns:>8.1} ns/op");
 
     let convert_ns = measure(iterations, || {
-        let instant = NtpInstant::from_unix_nanos(std::hint::black_box(
-            1_700_000_000_123_456_789i128,
-        ));
+        let instant =
+            NtpInstant::from_unix_nanos(std::hint::black_box(1_700_000_000_123_456_789i128));
         instant.to_timestamp().is_ok()
     });
     let _ = writeln!(out, "timestamp conversion       {convert_ns:>8.1} ns/op");

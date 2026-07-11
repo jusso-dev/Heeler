@@ -311,7 +311,10 @@ mod tests {
     fn fraction_round_trip_error_below_one_nanosecond() {
         for nanos in [0u32, 1, 2, 999, 123_456_789, 500_000_000, 999_999_999] {
             let back = NtpTimestamp::fraction_to_nanos(NtpTimestamp::fraction_from_nanos(nanos));
-            assert!(back <= nanos && nanos - back <= 1, "nanos={nanos} back={back}");
+            assert!(
+                back <= nanos && nanos - back <= 1,
+                "nanos={nanos} back={back}"
+            );
         }
     }
 

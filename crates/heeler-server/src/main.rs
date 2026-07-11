@@ -281,9 +281,10 @@ fn serve(args: ServeArgs) -> anyhow::Result<()> {
 
     // Bind sockets while still privileged, then drop privileges while the
     // process is single-threaded, then start the runtime.
-    let sockets =
-        bind_sockets(&validated.config.server).context("binding UDP sockets (port 123 needs \
-             CAP_NET_BIND_SERVICE, root, or a high port)")?;
+    let sockets = bind_sockets(&validated.config.server).context(
+        "binding UDP sockets (port 123 needs \
+             CAP_NET_BIND_SERVICE, root, or a high port)",
+    )?;
 
     #[cfg(unix)]
     if validated.config.security.drop_privileges {
@@ -314,10 +315,7 @@ fn serve(args: ServeArgs) -> anyhow::Result<()> {
     runtime.block_on(run(validated, sockets))
 }
 
-async fn run(
-    validated: ValidatedConfig,
-    sockets: Vec<std::net::UdpSocket>,
-) -> anyhow::Result<()> {
+async fn run(validated: ValidatedConfig, sockets: Vec<std::net::UdpSocket>) -> anyhow::Result<()> {
     let system_clock = Arc::new(
         SystemClockSource::new(
             validated.jump_policy,

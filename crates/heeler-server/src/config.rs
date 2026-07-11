@@ -487,10 +487,14 @@ impl Config {
                 ));
             }
             if self.rate_limit.max_client_entries == 0 {
-                return Err(invalid("rate_limit.max_client_entries must be positive".into()));
+                return Err(invalid(
+                    "rate_limit.max_client_entries must be positive".into(),
+                ));
             }
             if self.rate_limit.client_entry_ttl_seconds == 0 {
-                return Err(invalid("rate_limit.client_entry_ttl_seconds must be positive".into()));
+                return Err(invalid(
+                    "rate_limit.client_entry_ttl_seconds must be positive".into(),
+                ));
             }
         }
 
@@ -557,9 +561,7 @@ impl Config {
 
 fn is_public_address(addr: &SocketAddr) -> bool {
     match addr.ip() {
-        std::net::IpAddr::V4(ip) => {
-            !(ip.is_loopback() || ip.is_private() || ip.is_link_local())
-        }
+        std::net::IpAddr::V4(ip) => !(ip.is_loopback() || ip.is_private() || ip.is_link_local()),
         std::net::IpAddr::V6(ip) => {
             let is_ula = (ip.segments()[0] & 0xfe00) == 0xfc00;
             let is_link_local = (ip.segments()[0] & 0xffc0) == 0xfe80;

@@ -299,10 +299,7 @@ mod tests {
             RateDecision::LimitedPerClient { .. }
         ));
         assert_eq!(limiter.check(ip("10.0.0.2"), t0), RateDecision::Allowed);
-        assert_eq!(
-            limiter.check(ip("2001:db8::1"), t0),
-            RateDecision::Allowed
-        );
+        assert_eq!(limiter.check(ip("2001:db8::1"), t0), RateDecision::Allowed);
     }
 
     #[test]

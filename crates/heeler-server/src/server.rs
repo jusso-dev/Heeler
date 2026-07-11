@@ -109,8 +109,12 @@ impl ServerState {
         // 1. Size validation. `data` can never exceed max_packet_size + 1
         //    (the buffer size); a full buffer means a truncated datagram.
         if data.len() > self.max_packet_size {
-            metrics.malformed_packets_total.fetch_add(1, Ordering::Relaxed);
-            metrics.packets_dropped_total.fetch_add(1, Ordering::Relaxed);
+            metrics
+                .malformed_packets_total
+                .fetch_add(1, Ordering::Relaxed);
+            metrics
+                .packets_dropped_total
+                .fetch_add(1, Ordering::Relaxed);
             tracing::trace!(%source, len = data.len(), "dropped oversized datagram");
             return;
         }
@@ -122,7 +126,9 @@ impl ServerState {
                 self.send_kod(socket, data, source, KissCode::Deny, receive_timestamp)
                     .await;
             } else {
-                metrics.packets_dropped_total.fetch_add(1, Ordering::Relaxed);
+                metrics
+                    .packets_dropped_total
+                    .fetch_add(1, Ordering::Relaxed);
             }
             tracing::debug!(%source, "access denied");
             return;
@@ -137,7 +143,9 @@ impl ServerState {
                     self.send_kod(socket, data, source, KissCode::Rate, receive_timestamp)
                         .await;
                 } else {
-                    metrics.packets_dropped_total.fetch_add(1, Ordering::Relaxed);
+                    metrics
+                        .packets_dropped_total
+                        .fetch_add(1, Ordering::Relaxed);
                 }
                 return;
             }
@@ -145,7 +153,9 @@ impl ServerState {
                 // Never answered: a KoD per packet under global overload
                 // would reflect a flood 1:1.
                 metrics.rate_limited_total.fetch_add(1, Ordering::Relaxed);
-                metrics.packets_dropped_total.fetch_add(1, Ordering::Relaxed);
+                metrics
+                    .packets_dropped_total
+                    .fetch_add(1, Ordering::Relaxed);
                 return;
             }
         }
@@ -155,8 +165,12 @@ impl ServerState {
         let parsed = match NtpPacket::parse(data) {
             Ok(parsed) => parsed,
             Err(error) => {
-                metrics.malformed_packets_total.fetch_add(1, Ordering::Relaxed);
-                metrics.packets_dropped_total.fetch_add(1, Ordering::Relaxed);
+                metrics
+                    .malformed_packets_total
+                    .fetch_add(1, Ordering::Relaxed);
+                metrics
+                    .packets_dropped_total
+                    .fetch_add(1, Ordering::Relaxed);
                 tracing::trace!(%source, %error, "dropped malformed datagram");
                 return;
             }
@@ -166,17 +180,24 @@ impl ServerState {
         if let Err(rejection) = self.policy.validate(&parsed) {
             match rejection {
                 RequestRejection::UnsupportedVersion(_) => {
-                    metrics.unsupported_version_total.fetch_add(1, Ordering::Relaxed);
+                    metrics
+                        .unsupported_version_total
+                        .fetch_add(1, Ordering::Relaxed);
                 }
                 RequestRejection::UnsupportedMode(_) => {
-                    metrics.unsupported_mode_total.fetch_add(1, Ordering::Relaxed);
+                    metrics
+                        .unsupported_mode_total
+                        .fetch_add(1, Ordering::Relaxed);
                 }
-                RequestRejection::TrailingData { .. }
-                | RequestRejection::ZeroTransmitTimestamp => {
-                    metrics.malformed_packets_total.fetch_add(1, Ordering::Relaxed);
+                RequestRejection::TrailingData { .. } | RequestRejection::ZeroTransmitTimestamp => {
+                    metrics
+                        .malformed_packets_total
+                        .fetch_add(1, Ordering::Relaxed);
                 }
             }
-            metrics.packets_dropped_total.fetch_add(1, Ordering::Relaxed);
+            metrics
+                .packets_dropped_total
+                .fetch_add(1, Ordering::Relaxed);
             tracing::trace!(%source, %rejection, "dropped rejected packet");
             return;
         }
@@ -202,7 +223,9 @@ impl ServerState {
             Ok(reading) => reading.timestamp,
             Err(error) => {
                 metrics.clock_errors_total.fetch_add(1, Ordering::Relaxed);
-                metrics.packets_dropped_total.fetch_add(1, Ordering::Relaxed);
+                metrics
+                    .packets_dropped_total
+                    .fetch_add(1, Ordering::Relaxed);
                 tracing::warn!(%error, "clock read failed; dropping request");
                 return;
             }

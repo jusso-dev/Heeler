@@ -373,13 +373,22 @@ mod tests {
     #[test]
     fn precision_from_duration() {
         // 1 µs ≈ 2^-20 s
-        assert_eq!(ClockPrecision::from_duration(Duration::from_micros(1)).0, -20);
+        assert_eq!(
+            ClockPrecision::from_duration(Duration::from_micros(1)).0,
+            -20
+        );
         // 1 ns clamps near the bottom of the range.
-        assert_eq!(ClockPrecision::from_duration(Duration::from_nanos(1)).0, -30);
+        assert_eq!(
+            ClockPrecision::from_duration(Duration::from_nanos(1)).0,
+            -30
+        );
         // 1 s is exponent 0.
         assert_eq!(ClockPrecision::from_duration(Duration::from_secs(1)).0, 0);
         // 1 ms ≈ 2^-10 s
-        assert_eq!(ClockPrecision::from_duration(Duration::from_millis(1)).0, -10);
+        assert_eq!(
+            ClockPrecision::from_duration(Duration::from_millis(1)).0,
+            -10
+        );
     }
 
     #[test]

@@ -184,7 +184,10 @@ mod tests {
     #[test]
     fn ipv4_mapped_ipv6_uses_v4_rules() {
         let acl = table(&["127.0.0.0/8"], &[], "deny");
-        assert_eq!(acl.evaluate(ip("::ffff:127.0.0.1")), AccessDecision::Allowed);
+        assert_eq!(
+            acl.evaluate(ip("::ffff:127.0.0.1")),
+            AccessDecision::Allowed
+        );
         assert_eq!(acl.evaluate(ip("::ffff:8.8.8.8")), AccessDecision::Denied);
     }
 
@@ -197,12 +200,7 @@ mod tests {
 
     #[test]
     fn invalid_rules_rejected() {
-        assert!(AccessControl::from_rules(
-            &["not-a-cidr".to_owned()],
-            &[],
-            "deny"
-        )
-        .is_err());
+        assert!(AccessControl::from_rules(&["not-a-cidr".to_owned()], &[], "deny").is_err());
         assert!(AccessControl::from_rules(&[], &[], "maybe").is_err());
     }
 }

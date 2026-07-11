@@ -1,0 +1,22 @@
+#!/bin/sh
+# postinst skeleton for the heeler package.
+set -e
+
+case "$1" in
+configure)
+    # System user for the daemon (systemd starts Heeler as this user).
+    if ! getent passwd heeler >/dev/null; then
+        adduser --system --group --no-create-home \
+            --home /nonexistent --shell /usr/sbin/nologin heeler
+    fi
+    # Default configuration, preserved across upgrades.
+    if [ ! -f /etc/heeler/heeler.toml ]; then
+        install -D -m 0644 /usr/share/heeler/heeler.example.toml \
+            /etc/heeler/heeler.toml
+    fi
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

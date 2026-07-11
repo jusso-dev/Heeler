@@ -1,0 +1,2 @@
+# Lint against the workspace MSRV so suggestions stay compatible.
+msrv = "1.82"

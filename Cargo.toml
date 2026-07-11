@@ -1,6 +1,9 @@
 [workspace]
 resolver = "2"
 members = ["crates/heeler-core", "crates/heeler-server"]
+# The fuzz crate builds with cargo-fuzz (nightly + libFuzzer), not as part
+# of the normal workspace.
+exclude = ["fuzz"]
 
 [workspace.package]
 version = "0.1.0"

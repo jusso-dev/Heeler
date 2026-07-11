@@ -87,7 +87,8 @@ struct ServeArgs {
 
 #[derive(Args)]
 struct QueryArgs {
-    /// Server to query: host, host:port, IP, or [v6]:port (port 123 default).
+    /// Server to query: host, host:port, IP, or bracketed IPv6 with port
+    /// (port 123 by default).
     server: String,
     /// NTP version to send.
     #[arg(long, default_value_t = 4, value_parser = clap::value_parser!(u8).range(3..=4))]

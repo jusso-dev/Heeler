@@ -107,14 +107,18 @@ async fn flood_with_rate_limit_stays_bounded_and_alive() {
         "rate limiter must curb a flood (got {replies})"
     );
     assert!(server.state.limiter.active_entries() <= 1);
+    // The kernel may drop part of the burst before the server reads it, so
+    // assert relative to what the server actually processed: everything
+    // beyond the bucket (burst 20 + refill margin) must be rate-limited.
+    let seen = server.state.metrics.requests_total.load(Ordering::Relaxed);
+    let limited = server
+        .state
+        .metrics
+        .rate_limited_total
+        .load(Ordering::Relaxed);
     assert!(
-        server
-            .state
-            .metrics
-            .rate_limited_total
-            .load(Ordering::Relaxed)
-            > 300,
-        "most of the flood must be rate-limited"
+        limited >= seen.saturating_sub(40),
+        "flood must be rate-limited: server saw {seen}, limited {limited}"
     );
 
     // And the server still works afterwards for a well-behaved client
